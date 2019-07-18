@@ -19,7 +19,8 @@ const DefaultOptions = {
   directory: './orbitdb',
   replicate: true,
   referenceCount: 64,
-  replicationConcurrency: 128
+  replicationConcurrency: 128,
+  syncLocal: false
 }
 
 class Store {
@@ -54,7 +55,7 @@ class Store {
     this.access = options.accessController || defaultAccess
 
     // Create the operations log
-    this._oplog = new Log(this._ipfs, this.identity, { logId: this.id, access: this.access })
+    this._oplog = new Log(this._ipfs, this.identity, { logId: this.id, access: this.access, sortFn: options.sortFn })
 
     // Create the index
     this._index = new this.options.Index(this.identity.publicKey)
@@ -199,7 +200,6 @@ class Store {
 
   async load (amount) {
     amount = amount || this.options.maxHistory
-
 
     const localHeads = await this._cache.get('_localHeads') || []
     const remoteHeads = await this._cache.get('_remoteHeads') || []
@@ -417,8 +417,26 @@ class Store {
     this._recalculateReplicationProgress()
   }
 
+  async syncLocal () {
+    const localHeads = await this._cache.get('_localHeads') || []
+    const remoteHeads = await this._cache.get('_remoteHeads') || []
+    const heads = localHeads.concat(remoteHeads)
+    for (let i = 0; i < heads.length; i++) {
+      const head = heads[i]
+      if (!this._oplog.heads.includes(head)) {
+        await this.load()
+        break
+      }
+    }
+  }
+
   async _addOperation (data, batchOperation, lastOperation, onProgressCallback) {
     if (this._oplog) {
+      // check local cache?
+      if (this.options.syncLocal) {
+        await this.syncLocal()
+      }
+
       const entry = await this._oplog.append(data, this.options.referenceCount)
       this._recalculateReplicationStatus(this.replicationStatus.progress + 1, entry.clock.time)
       await this._cache.set('_localHeads', [entry])
