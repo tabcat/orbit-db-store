@@ -72,7 +72,7 @@ Object.keys(testAPIs).forEach((IPFS) => {
         assert.strictEqual(entry.payload, data)
         assert.strictEqual(store.replicationStatus.progress, 1)
         assert.strictEqual(store.replicationStatus.max, 1)
-        assert.strictEqual(store.identity.publicKey, store._index.id)
+        assert.strictEqual(store.address.root, store._index.id)
         assert.deepStrictEqual(store._index._index, heads)
         store._cache.get("_localHeads").then((localHeads) => {
           assert.deepStrictEqual(localHeads[0].payload, data)
