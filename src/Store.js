@@ -176,7 +176,7 @@ class Store {
     this.events.removeAllListeners('write')
 
     // Close cache
-    await this._cache.close()
+    if(this._cache) await this._cache.close()
 
     // Database is now closed
     // TODO: afaik we don't use 'closed' event anymore,
@@ -482,3 +482,4 @@ class Store {
 }
 
 module.exports = Store
+module.exports.DefaultOptions = DefaultOptions
