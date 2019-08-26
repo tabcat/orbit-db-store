@@ -29,7 +29,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ./
-      - run: npm run test
+      - run: npm run test:node
   test-browser:
     executor: node10-browsers
     steps:
@@ -51,10 +51,9 @@ workflows:
       - test-node:
           requires:
             - setup
-
-              #      - test-browser:
-              #          requires:
-              #            - setup
-              #      - build:
-              #          requires:
-              #            - setup
+      - test-browser:
+          requires:
+            - setup
+      - build:
+          requires:
+            - setup

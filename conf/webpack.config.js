@@ -3,11 +3,11 @@
 const path = require('path')
 
 module.exports = {
-  entry: './src/keystore.js',
+  entry: './src/Store.js',
   output: {
     libraryTarget: 'var',
-    library: 'Keystore',
-    filename: 'orbit-db-keystore.min.js'
+    library: 'Store',
+    filename: 'orbit-db-store.min.js'
   },
   target: 'web',
   mode: 'production',
