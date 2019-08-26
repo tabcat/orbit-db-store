@@ -2,11 +2,8 @@
 
 var assert = require('assert')
 const Store = require('../src/Store')
-const fs = require('fs-extra')
 
-const Log = require('ipfs-log')
-const AccessController = Log.AccessController
-const Cache = require("orbit-db-cache")
+const Cache = require('orbit-db-cache')
 const Keystore = require('orbit-db-keystore')
 const IdentityProvider = require('orbit-db-identity-provider')
 const DefaultOptions = Store.DefaultOptions
@@ -29,23 +26,21 @@ Object.keys(testAPIs).forEach((IPFS) => {
 
     this.timeout(config.timeout)
 
-    const testACL = new AccessController()
-    const { identityKeyFixtures, signingKeyFixtures, identityKeysPath, signingKeysPath } = config
     const ipfsConfig = Object.assign({}, config.defaultIpfsConfig, {
       repo: config.defaultIpfsConfig.repo + '-entry' + new Date().getTime()
     })
 
-    before(async() => {
-      identityStore = await storage.createStore("identity")
+    before(async () => {
+      identityStore = await storage.createStore('identity')
       const keystore = new Keystore(identityStore)
 
-      cacheStore = await storage.createStore("cache")
+      cacheStore = await storage.createStore('cache')
       const cache = new Cache(cacheStore)
 
       testIdentity = await IdentityProvider.createIdentity({ id: 'userA', keystore })
       ipfs = await startIpfs(IPFS, ipfsConfig)
 
-      const address = "test-address"
+      const address = 'test-address'
       const options = Object.assign({}, DefaultOptions, { cache })
       store = new Store(ipfs, testIdentity, address, options)
     })
@@ -63,12 +58,11 @@ Object.keys(testAPIs).forEach((IPFS) => {
       await identityStore.open()
     })
 
-    it("Saves a local snapshot", async () => {
-      const writes = 10;
-      const eventsFired = 0;
+    it('Saves a local snapshot', async () => {
+      const writes = 10
 
-      for(let i = 0; i < writes; i++) {
-        await store._addOperation({ "step": i })
+      for (let i = 0; i < writes; i++) {
+        await store._addOperation({ 'step': i })
       }
       const snapshot = await store.saveSnapshot()
       assert.strictEqual(snapshot[0].path.length, 46)
@@ -77,18 +71,17 @@ Object.keys(testAPIs).forEach((IPFS) => {
       assert.strictEqual(snapshot[0].size > writes * 200, true)
     })
 
-    it("Successfully loads a saved snapshot", async() => {
-      const writes = 10;
-      const eventsFired = 0;
+    it('Successfully loads a saved snapshot', async () => {
+      const writes = 10
 
-      for(let i = 0; i < writes; i++) {
-        await store._addOperation({ "step": i })
+      for (let i = 0; i < writes; i++) {
+        await store._addOperation({ 'step': i })
       }
-      const savedSnapshot = await store.saveSnapshot()
+      await store.saveSnapshot()
       const storeFromSnapshot = await store.loadFromSnapshot()
       assert.strictEqual(storeFromSnapshot.index.length, 10)
 
-      for(let i = 0; i < writes; i++) {
+      for (let i = 0; i < writes; i++) {
         assert.strictEqual(storeFromSnapshot.index[i].payload.step, i)
       }
     })

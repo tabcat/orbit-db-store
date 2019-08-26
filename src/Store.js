@@ -183,7 +183,7 @@ class Store {
     this.events.removeAllListeners('write')
 
     // Close cache
-    if(this._cache) await this._cache.close()
+    if (this._cache) await this._cache.close()
 
     // Database is now closed
     // TODO: afaik we don't use 'closed' event anymore,
@@ -207,7 +207,7 @@ class Store {
 
   async load (amount, { fetchEntryTimeout } = {}) {
     amount = amount || this.options.maxHistory
-    fetchEntryTimeout = fetchEntryTimeout || this.options.fetchEntryTimeout;
+    fetchEntryTimeout = fetchEntryTimeout || this.options.fetchEntryTimeout
 
     const localHeads = await this._cache.get('_localHeads') || []
     const remoteHeads = await this._cache.get('_remoteHeads') || []
@@ -219,7 +219,7 @@ class Store {
 
     await mapSeries(heads, async (head) => {
       this._recalculateReplicationMax(head.clock.time)
-      const log = await Log.fromEntryHash(this._ipfs, this.identity, head.hash, { logId: this._oplog.id, access: this.access, sortFn: this.options.sortFn, length: amount, exclude: this._oplog.values, onProgressCallback:  this._onLoadProgress.bind(this), timeout: fetchEntryTimeout })
+      const log = await Log.fromEntryHash(this._ipfs, this.identity, head.hash, { logId: this._oplog.id, access: this.access, sortFn: this.options.sortFn, length: amount, exclude: this._oplog.values, onProgressCallback: this._onLoadProgress.bind(this), timeout: fetchEntryTimeout })
       await this._oplog.join(log, amount)
     })
 

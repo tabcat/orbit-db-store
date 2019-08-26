@@ -2,11 +2,8 @@
 
 var assert = require('assert')
 const Store = require('../src/Store')
-const fs = require('fs-extra')
 
-const Log = require('ipfs-log')
-const AccessController = Log.AccessController
-const Cache = require("orbit-db-cache")
+const Cache = require('orbit-db-cache')
 const Keystore = require('orbit-db-keystore')
 const IdentityProvider = require('orbit-db-identity-provider')
 const DefaultOptions = Store.DefaultOptions
@@ -29,23 +26,21 @@ Object.keys(testAPIs).forEach((IPFS) => {
 
     this.timeout(config.timeout)
 
-    const testACL = new AccessController()
-    const { identityKeyFixtures, signingKeyFixtures, identityKeysPath, signingKeysPath } = config
     const ipfsConfig = Object.assign({}, config.defaultIpfsConfig, {
       repo: config.defaultIpfsConfig.repo + '-entry' + new Date().getTime()
     })
 
-    before(async() => {
-      identityStore = await storage.createStore("identity")
+    before(async () => {
+      identityStore = await storage.createStore('identity')
       const keystore = new Keystore(identityStore)
 
-      cacheStore = await storage.createStore("cache")
+      cacheStore = await storage.createStore('cache')
       const cache = new Cache(cacheStore)
 
       testIdentity = await IdentityProvider.createIdentity({ id: 'userA', keystore })
       ipfs = await startIpfs(IPFS, ipfsConfig)
 
-      const address = "test-address"
+      const address = 'test-address'
       store = new Store(ipfs, testIdentity, address, DefaultOptions)
       const options = Object.assign({}, DefaultOptions, { cache })
       storeWithCache = new Store(ipfs, testIdentity, address, options)
@@ -77,8 +72,8 @@ Object.keys(testAPIs).forEach((IPFS) => {
       assert.strictEqual(typeof store._loader, 'object')
     })
 
-    it("properly defines a cache", async() => {
-      assert.strictEqual(typeof storeWithCache._cache, "object")
+    it('properly defines a cache', async () => {
+      assert.strictEqual(typeof storeWithCache._cache, 'object')
     })
   })
 })
